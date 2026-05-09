@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم مشروع العمر | إدارة المسجلين</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c99a2b;
+            --gold-deep: #a67c1e;
+            --gold-light: #f7e7b4;
+            --teal: #0d5559;
+            --teal-dark: #083a3d;
+            --teal-light: #1a7a7f;
+            --cream: #fdf8f0;
+            --white: #ffffff;
+            --red: #c0392b;
+            --green: #27ae60;
+            --green-light: #2ecc71;
+            --orange: #e67e22;
+            --text: #2c2416;
+            --text-light: #7a6f5f;
+            --shadow: 0 4px 24px rgba(0,0,0,0.1);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.15);
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #faf7f0;
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .bg-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.03;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c99a2b' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(135deg, var(--teal-dark), var(--teal), var(--teal-light));
+            color: #fff; padding: 20px 28px; border-radius: var(--radius-lg);
+            margin-bottom: 24px; box-shadow: var(--shadow-lg);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px;
+        }
+        .header-title { font-size: 1.8rem; font-weight: 900; }
+        .header-subtitle { font-size: 0.9rem; opacity: 0.85; }
+        .header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 24px; border-radius: 50px; border: none;
+            font-weight: 700; cursor: pointer; font-family: inherit;
+            font-size: 0.95rem; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-refresh { background: rgba(255,255,255,0.15); color: #fff; }
+        .btn-refresh:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+        .btn-back { background: var(--gold); color: #1a1a1a; }
+        .btn-back:hover { background: var(--gold-deep); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* بطاقات الإحصائيات */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--white); border-radius: var(--radius);
+            padding: 22px 26px; box-shadow: var(--shadow);
+            border-right: 4px solid var(--gold);
+            transition: var(--transition);
+            position: relative; overflow: hidden;
+        }
+        .stat-card.sent { border-right-color: var(--green); }
+        .stat-card.countries { border-right-color: var(--teal); }
+        .stat-card.last { border-right-color: var(--orange); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .stat-value { font-size: 2.4rem; font-weight: 900; color: var(--teal-dark); line-height: 1.2; }
+        .stat-label { font-size: 0.9rem; color: var(--text-light); font-weight: 600; }
+
+        /* شريط البحث والتصفية */
+        .filter-bar {
+            background: var(--white); border-radius: var(--radius);
+            padding: 16px 22px; margin-bottom: 20px;
+            box-shadow: var(--shadow); display: flex; gap: 14px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .filter-bar input {
+            flex: 1; min-width: 200px; padding: 12px 18px;
+            border: 2px solid #e8e0d0; border-radius: 50px;
+            font-family: inherit; font-size: 0.95rem;
+            transition: var(--transition); outline: none;
+        }
+        .filter-bar input:focus { border-color: var(--gold); }
+        .filter-badge {
+            background: var(--cream); padding: 10px 18px;
+            border-radius: 50px; font-weight: 700; font-size: 0.85rem;
+            color: var(--teal-dark);
+        }
+
+        /* الجدول */
+        .table-container {
+            background: var(--white); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg); overflow: hidden;
+        }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        thead th {
+            background: var(--teal-dark); color: #fff;
+            padding: 16px 14px; font-weight: 700; font-size: 0.9rem;
+            white-space: nowrap; position: sticky; top: 0; z-index: 2;
+        }
+        tbody td {
+            padding: 14px; text-align: center; border-bottom: 1px solid #f0ebe0;
+            font-size: 0.9rem; transition: var(--transition);
+        }
+        tbody tr { transition: var(--transition); }
+        tbody tr:hover { background: #fdf8f0; }
+        tbody tr.sent-row { opacity: 0.5; background: #f0fdf4; }
+        tbody tr.sending { animation: fadeOut 0.5s ease forwards; }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(30px); }
+        }
+        .name-cell { font-weight: 700; color: var(--teal-dark); text-align: right; }
+        .country-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 50px;
+            background: var(--cream); font-size: 0.8rem; font-weight: 600;
+        }
+        .btn-wa {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #25D366; color: #fff; padding: 9px 16px;
+            border-radius: 50px; text-decoration: none; font-weight: 700;
+            font-size: 0.8rem; transition: var(--transition); white-space: nowrap;
+        }
+        .btn-wa:hover { background: #1da851; transform: scale(1.05); }
+        .btn-sent {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--green); color: #fff; padding: 9px 16px;
+            border-radius: 50px; border: none; cursor: pointer; font-family: inherit;
+            font-weight: 700; font-size: 0.8rem; transition: var(--transition); white-space: nowrap;
+        }
+        .btn-sent:hover { background: #219a52; transform: scale(1.05); }
+        .btn-sent:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--text-light);
+        }
+        .empty-state .icon { font-size: 4rem; }
+        .loading-row td { text-align: center; padding: 40px; color: var(--text-light); }
+
+        /* إشعار Toast */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #1a1a1a; color: #fff; padding: 14px 28px;
+            border-radius: 50px; font-weight: 700; z-index: 999;
+            animation: slideUp 0.4s ease, fadeOutToast 0.4s ease 2.5s forwards;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3); font-family: inherit;
+        }
+        .toast.success { background: var(--green); }
+        .toast.error { background: var(--red); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOutToast {
+            to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+        }
+
+        @media (max-width: 768px) {
+            .header { text-align: center; justify-content: center; }
+            .header-title { font-size: 1.3rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-card { padding: 16px; }
+            .stat-value { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="container">
+        <!-- الهيدر -->
+        <header class="header">
+            <div>
+                <h1 class="header-title">📋 لوحة تحكم مشروع العمر</h1>
+                <p class="header-subtitle">إدارة المسجلين في قائمة الانتظار</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-refresh" onclick="loadDashboard()" id="refreshBtn">
+                    🔄 تحديث البيانات
+                </button>
+                <a href="index.html" class="btn btn-back">
+                    📿 صفحة التسجيل
+                </a>
+            </div>
+        </header>
+
+        <!-- الإحصائيات -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎓</div>
+                <div class="stat-value" id="statPending">--</div>
+                <div class="stat-label">مسجلين بانتظار التواصل</div>
+            </div>
+            <div class="stat-card sent">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="statSent">--</div>
+                <div class="stat-label">تم التواصل معهم</div>
+            </div>
+            <div class="stat-card countries">
+                <div class="stat-icon">🌍</div>
+                <div class="stat-value" id="statCountries">--</div>
+                <div class="stat-label">دول مختلفة</div>
+            </div>
+            <div class="stat-card last">
+                <div class="stat-icon">🕐</div>
+                <div class="stat-value" id="statLast" style="font-size:1rem;">--</div>
+                <div class="stat-label">آخر تسجيل</div>
+            </div>
+        </div>
+
+        <!-- شريط البحث -->
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم، البريد، الهاتف أو الدولة..." oninput="filterTable()">
+            <span class="filter-badge">📊 عدد النتائج: <strong id="resultCount">--</strong></span>
+        </div>
+
+        <!-- الجدول -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>التاريخ</th>
+                            <th>الاسم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>رقم الواتساب</th>
+                            <th>الدولة</th>
+                            <th>واتساب</th>
+                            <th>تم الإرسال</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr class="loading-row"><td colspan="8">⏳ جاري تحميل البيانات...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // ⚠️ استبدل هذا بالرابط الجديد من Apps Script
+        // =============================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzKPBPuDVUDKEdwj4ScZTajdH1pkiNwDYto6XrpGrIarBETYIrevagoV7OS0L7JbuvA/exec';
+
+        let allRegistrations = [];
+
+        // ==================== تحميل البيانات ====================
+        async function loadDashboard() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '⏳ جاري التحميل...';
+
+            try {
+                // تحميل الإحصائيات
+                const statsRes = await fetch(API_URL + '?action=stats');
+                const stats = await statsRes.json();
+                if (stats.success) {
+                    document.getElementById('statPending').textContent = stats.pendingTotal || 0;
+                    document.getElementById('statSent').textContent = stats.sentTotal || 0;
+                    document.getElementById('statCountries').textContent = stats.uniqueCountries || 0;
+                    if (stats.lastRegistration) {
+                        document.getElementById('statLast').textContent = 
+                            stats.lastRegistration[1] + ' - ' + stats.lastRegistration[0];
+                    } else {
+                        document.getElementById('statLast').textContent = 'لا يوجد';
+                    }
+                }
+
+                // تحميل المسجلين
+                const regRes = await fetch(API_URL + '?action=getAll');
+                const regData = await regRes.json();
+                if (regData.success) {
+                    allRegistrations = regData.registrations || [];
+                    renderTable(allRegistrations);
+                } else {
+                    showToast('❌ فشل تحميل البيانات', 'error');
+                }
+            } catch (err) {
+                console.error('❌ خطأ:', err);
+                showToast('❌ فشل الاتصال بالخادم', 'error');
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 تحديث البيانات';
+            }
+        }
+
+        // ==================== عرض الجدول ====================
+        function renderTable(registrations) {
+            const tbody = document.getElementById('tableBody');
+            document.getElementById('resultCount').textContent = registrations.length;
+
+            if (registrations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
+                    <div class="icon">📭</div>
+                    <h3>لا يوجد مسجلين حالياً</h3>
+                    <p>عند تسجيل متدربين جدد، سيظهرون هنا</p>
+                </div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = registrations.map((reg, index) => `
+                <tr id="row-${reg.row}">
+                    <td>${index + 1}</td>
+                    <td>${reg.timestamp || '--'}</td>
+                    <td class="name-cell">${escapeHtml(reg.name)}</td>
+                    <td>${escapeHtml(reg.email)}</td>
+                    <td dir="ltr">${escapeHtml(reg.phone)}</td>
+                    <td><span class="country-badge">${getCountryFlag(reg.country)} ${reg.country}</span></td>
+                    <td>
+                        <a href="${reg.whatsappLink}" target="_blank" class="btn-wa" title="فتح المحادثة في واتساب">
+                            💬 واتساب
+                        </a>
+                    </td>
+                    <td>
+                        <button class="btn-sent" onclick="markAsSent(${reg.row}, this)" title="نقل إلى قائمة تم الإرسال">
+                            ✅ تم الإرسال
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ==================== بحث وتصفية ====================
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderTable(allRegistrations);
+                return;
+            }
+            const filtered = allRegistrations.filter(reg => 
+                (reg.name && reg.name.toLowerCase().includes(query)) ||
+                (reg.email && reg.email.toLowerCase().includes(query)) ||
+                (reg.phone && reg.phone.includes(query)) ||
+                (reg.country && reg.country.toLowerCase().includes(query))
+            );
+            renderTable(filtered);
+        }
+
+        // ==================== نقل إلى تم الإرسال ====================
+        async function markAsSent(rowNumber, btnElement) {
+            if (!confirm('هل أنت متأكد من نقل هذا المتدرب إلى قائمة "تم الإرسال"؟')) return;
+
+            btnElement.disabled = true;
+            btnElement.textContent = '⏳ جاري...';
+
+            try {
+                const response = await fetch(API_URL + '?action=moveToSent&row=' + rowNumber);
+                const result = await response.json();
+
+                if (result.success) {
+                    // إضافة تأثير حركي
+                    const row = document.getElementById('row-' + rowNumber);
+                    if (row) {
+                        row.classList.add('sending');
+                        setTimeout(() => {
+                            row.remove();
+                            // تحديث الأرقام التسلسلية
+                            updateRowNumbers();
+                            document.getElementById('resultCount').textContent = 
+                                document.querySelectorAll('#tableBody tr').length;
+                        }, 400);
+                    }
+                    
+                    // تحديث الإحصائيات
+                    document.getElementById('statPending').textContent = result.remainingTotal || 0;
+                    document.getElementById('statSent').textContent = result.sentTotal || 0;
+                    
+                    showToast('✅ ' + result.message, 'success');
+                } else {
+                    showToast('❌ ' + (result.error || 'حدث خطأ'), 'error');
+                    btnElement.disabled = false;
+                    btnElement.textContent = '✅ تم الإرسال';
+                }
+            } catch (err) {
+                console.error('❌ خطأ:', err);
+                showToast('❌ فشل الاتصال بالخادم', 'error');
+                btnElement.disabled = false;
+                btnElement.textContent = '✅ تم الإرسال';
+            }
+        }
+
+        // ==================== دوال مساعدة ====================
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((row, index) => {
+                const firstCell = row.querySelector('td:first-child');
+                if (firstCell) firstCell.textContent = index + 1;
+            });
+        }
+
+        function getCountryFlag(code) {
+            const flags = {
+                'SA': '🇸🇦', 'EG': '🇪🇬', 'AE': '🇦🇪', 'KW': '🇰🇼', 'QA': '🇶🇦',
+                'OM': '🇴🇲', 'BH': '🇧🇭', 'JO': '🇯🇴', 'PS': '🇵🇸', 'IQ': '🇮🇶',
+                'YE': '🇾🇪', 'SY': '🇸🇾', 'LB': '🇱🇧', 'LY': '🇱🇾', 'TN': '🇹🇳',
+                'DZ': '🇩🇿', 'MA': '🇲🇦', 'SD': '🇸🇩', 'TR': '🇹🇷', 'ID': '🇮🇩',
+                'MY': '🇲🇾', 'PK': '🇵🇰', 'IN': '🇮🇳', 'BD': '🇧🇩', 'GB': '🇬🇧',
+                'US': '🇺🇸', 'CA': '🇨🇦', 'AU': '🇦🇺', 'DE': '🇩🇪', 'FR': '🇫🇷'
+            };
+            return flags[code] || '🌍';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ==================== بدء التحميل ====================
+        loadDashboard();
+
+        // تحديث تلقائي كل 5 دقائق
+        setInterval(loadDashboard, 300000);
+
+        console.log('%c📋 لوحة تحكم مشروع العمر %c| %cجاهزة للعمل',
+            'color: #c99a2b; font-size: 1.3rem;', '', 'color: #0d5559;');
+    </script>
+</body>
+</html>

@@ -26,14 +26,28 @@
             --radius: 14px;
             --radius-lg: 22px;
             --transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            --bg: #faf7f0;
+            --card-bg: #ffffff;
+            --border: #f0ebe0;
+        }
+        .dark-mode {
+            --bg: #1a1a1a;
+            --card-bg: #252525;
+            --text: #e0e0e0;
+            --text-light: #aaa;
+            --border: #333;
+            --cream: #2a2a2a;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.5);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Cairo', sans-serif;
-            background: #faf7f0;
+            background: var(--bg);
             color: var(--text);
             line-height: 1.7;
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
         .bg-pattern {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -51,7 +65,7 @@
         }
         .header-title { font-size: 1.6rem; font-weight: 900; }
         .header-subtitle { font-size: 0.85rem; opacity: 0.85; }
-        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .btn {
             padding: 11px 22px; border-radius: 50px; border: none;
             font-weight: 700; cursor: pointer; font-family: inherit;
@@ -63,17 +77,31 @@
         .btn-refresh:hover { background: rgba(255,255,255,0.28); transform: translateY(-2px); }
         .btn-back { background: var(--gold); color: #1a1a1a; }
         .btn-back:hover { background: var(--gold-deep); transform: translateY(-2px); }
+        .btn-dark { background: rgba(255,255,255,0.18); color: #fff; font-size: 1.2rem; padding: 8px 14px; }
+        .btn-dark:hover { background: rgba(255,255,255,0.3); }
+        .btn-export { background: var(--orange); color: #fff; }
+        .btn-export:hover { background: #d35400; transform: translateY(-2px); }
+        .btn-bulk { background: var(--teal); color: #fff; }
+        .btn-bulk:hover { background: var(--teal-dark); transform: translateY(-2px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--card-bg); border-radius: var(--radius); padding: 4px; box-shadow: var(--shadow); }
+        .tab-btn {
+            flex: 1; padding: 12px 20px; border: none; border-radius: 12px;
+            font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.9rem;
+            transition: var(--transition); background: transparent; color: var(--text-light);
+        }
+        .tab-btn.active { background: var(--teal); color: #fff; box-shadow: var(--shadow); }
+        .tab-btn .count { background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 50px; font-size: 0.8rem; margin-right: 6px; }
 
         .stats-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px; margin-bottom: 20px;
         }
         .stat-card {
-            background: var(--white); border-radius: var(--radius);
+            background: var(--card-bg); border-radius: var(--radius);
             padding: 20px 24px; box-shadow: var(--shadow);
-            border-right: 4px solid var(--gold);
-            transition: var(--transition);
+            border-right: 4px solid var(--gold); transition: var(--transition);
         }
         .stat-card.sent { border-right-color: var(--green); }
         .stat-card.countries { border-right-color: var(--teal); }
@@ -84,7 +112,7 @@
         .stat-label { font-size: 0.85rem; color: var(--text-light); font-weight: 600; }
 
         .filter-bar {
-            background: var(--white); border-radius: var(--radius);
+            background: var(--card-bg); border-radius: var(--radius);
             padding: 14px 20px; margin-bottom: 18px;
             box-shadow: var(--shadow); display: flex; gap: 12px;
             flex-wrap: wrap; align-items: center;
@@ -94,40 +122,56 @@
             border: 2px solid #e8e0d0; border-radius: 50px;
             font-family: inherit; font-size: 0.9rem;
             transition: var(--transition); outline: none;
+            background: var(--card-bg); color: var(--text);
         }
+        .dark-mode .filter-bar input { border-color: #444; }
         .filter-bar input:focus { border-color: var(--gold); }
         .filter-badge {
             background: var(--cream); padding: 9px 16px;
             border-radius: 50px; font-weight: 700; font-size: 0.85rem;
             color: var(--teal-dark); white-space: nowrap;
         }
+        .timer-badge {
+            background: rgba(201,154,43,0.1); padding: 9px 16px;
+            border-radius: 50px; font-weight: 700; font-size: 0.8rem;
+            color: var(--gold-deep); white-space: nowrap;
+        }
 
         .table-container {
-            background: var(--white); border-radius: var(--radius-lg);
+            background: var(--card-bg); border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg); overflow: hidden;
         }
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; }
         thead th {
             background: var(--teal-dark); color: #fff;
             padding: 14px 12px; font-weight: 700; font-size: 0.85rem;
             white-space: nowrap; position: sticky; top: 0; z-index: 2;
         }
         tbody td {
-            padding: 12px 10px; text-align: center; border-bottom: 1px solid #f0ebe0;
+            padding: 12px 10px; text-align: center; border-bottom: 1px solid var(--border);
             font-size: 0.85rem; transition: var(--transition);
         }
         tbody tr { transition: var(--transition); }
-        tbody tr:hover { background: #fdf8f0; }
+        tbody tr:hover { background: rgba(201,154,43,0.03); }
+        .dark-mode tbody tr:hover { background: rgba(255,255,255,0.02); }
         tbody tr.removing { animation: fadeOut 0.4s ease forwards; }
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateX(30px); }
-        }
-        .name-cell { font-weight: 700; color: var(--teal-dark); text-align: right; }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(30px); } }
+        .name-cell { font-weight: 700; color: var(--teal-dark); text-align: right; cursor: pointer; }
+        .name-cell:hover { color: var(--gold); }
         .country-badge {
             display: inline-block; padding: 4px 10px; border-radius: 50px;
             background: var(--cream); font-size: 0.78rem; font-weight: 600;
         }
+        .phone-cell { cursor: pointer; position: relative; }
+        .phone-cell:hover { color: var(--teal); }
+        .copy-tooltip {
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            background: #1a1a1a; color: #fff; padding: 4px 12px; border-radius: 50px;
+            font-size: 0.7rem; white-space: nowrap; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        .phone-cell:hover .copy-tooltip { opacity: 1; }
         .btn-wa {
             display: inline-flex; align-items: center; gap: 5px;
             background: #25D366; color: #fff; padding: 8px 14px;
@@ -143,12 +187,8 @@
         }
         .btn-sent:hover { background: #219a52; transform: scale(1.04); }
         .btn-sent:disabled { background: #aaa; cursor: not-allowed; transform: none; }
-        .empty-state {
-            text-align: center; padding: 50px 20px; color: var(--text-light);
-        }
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-light); }
         .empty-state .icon { font-size: 3.5rem; margin-bottom: 10px; }
-        .loading-row td { text-align: center; padding: 35px; color: var(--text-light); }
-        .error-row td { text-align: center; padding: 35px; color: var(--red); }
 
         .toast {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -168,6 +208,21 @@
             to { opacity: 0; transform: translateX(-50%) translateY(10px); }
         }
 
+        /* Chart bar simple */
+        .chart-bar {
+            display: flex; align-items: end; gap: 4px; height: 80px;
+            margin: 10px 0; padding: 0 10px;
+        }
+        .chart-bar .bar {
+            flex: 1; background: var(--teal); border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease; min-width: 20px;
+            position: relative;
+        }
+        .chart-bar .bar .bar-label {
+            position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+            font-size: 0.6rem; color: var(--text-light); white-space: nowrap;
+        }
+
         @media (max-width: 768px) {
             .header { text-align: center; justify-content: center; }
             .header-title { font-size: 1.2rem; }
@@ -175,6 +230,7 @@
             .stat-card { padding: 14px; }
             .stat-value { font-size: 1.5rem; }
             .btn { padding: 10px 16px; font-size: 0.8rem; }
+            .tabs { flex-direction: column; }
         }
     </style>
 </head>
@@ -187,41 +243,35 @@
                 <p class="header-subtitle">إدارة المسجلين في قائمة الانتظار</p>
             </div>
             <div class="header-actions">
-                <button class="btn btn-refresh" onclick="loadDashboard()" id="refreshBtn">
-                    🔄 تحديث البيانات
-                </button>
-                <a href="index.html" class="btn btn-back">
-                    📿 صفحة التسجيل
-                </a>
+                <button class="btn btn-dark" onclick="toggleDarkMode()" title="تبديل الوضع الليلي">🌓</button>
+                <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير Excel</button>
+                <button class="btn btn-bulk" onclick="bulkMoveAll()">📦 نقل الكل</button>
+                <button class="btn btn-refresh" onclick="loadDashboard()" id="refreshBtn">🔄 تحديث</button>
+                <a href="index.html" class="btn btn-back">📿 التسجيل</a>
             </div>
         </header>
 
+        <!-- تبويبات -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('pending')">
+                🎓 قيد الانتظار <span class="count" id="pendingCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('sent')">
+                ✅ تم الإرسال <span class="count" id="sentCount">0</span>
+            </button>
+        </div>
+
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">🎓</div>
-                <div class="stat-value" id="statPending">--</div>
-                <div class="stat-label">مسجلين بانتظار التواصل</div>
-            </div>
-            <div class="stat-card sent">
-                <div class="stat-icon">✅</div>
-                <div class="stat-value" id="statSent">--</div>
-                <div class="stat-label">تم التواصل معهم</div>
-            </div>
-            <div class="stat-card countries">
-                <div class="stat-icon">🌍</div>
-                <div class="stat-value" id="statCountries">--</div>
-                <div class="stat-label">دول مختلفة</div>
-            </div>
-            <div class="stat-card last">
-                <div class="stat-icon">🕐</div>
-                <div class="stat-value" id="statLast" style="font-size:0.9rem;">--</div>
-                <div class="stat-label">آخر تسجيل</div>
-            </div>
+            <div class="stat-card"><div class="stat-icon">🎓</div><div class="stat-value" id="statPending">--</div><div class="stat-label">مسجلين بانتظار التواصل</div></div>
+            <div class="stat-card sent"><div class="stat-icon">✅</div><div class="stat-value" id="statSent">--</div><div class="stat-label">تم التواصل معهم</div></div>
+            <div class="stat-card countries"><div class="stat-icon">🌍</div><div class="stat-value" id="statCountries">--</div><div class="stat-label">دول مختلفة</div></div>
+            <div class="stat-card last"><div class="stat-icon">🕐</div><div class="stat-value" id="statLast" style="font-size:0.9rem;">--</div><div class="stat-label">آخر تسجيل</div></div>
         </div>
 
         <div class="filter-bar">
             <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم، البريد، الهاتف أو الدولة..." oninput="filterTable()">
-            <span class="filter-badge">📊 عدد النتائج: <strong id="resultCount">--</strong></span>
+            <span class="filter-badge">📊 النتائج: <strong id="resultCount">--</strong></span>
+            <span class="timer-badge">⏱ تحديث بعد: <strong id="countdown">5:00</strong></span>
         </div>
 
         <div class="table-container">
@@ -229,6 +279,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()" title="تحديد الكل"></th>
                             <th>#</th>
                             <th>التاريخ</th>
                             <th>الاسم</th>
@@ -240,7 +291,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr class="loading-row"><td colspan="8">⏳ جاري تحميل البيانات...</td></tr>
+                        <tr><td colspan="9" style="text-align:center;padding:35px;">⏳ جاري تحميل البيانات...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -248,228 +299,234 @@
     </div>
 
     <script>
-        // =============================================
-        // ⚠️ استبدل هذا بالرابط الجديد من Apps Script
-        // =============================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzY3txfyL5ZKRg25oqY-0QokZKIAisvfDYvxmjmN8tJ_eP_9awDyeGwdTxVwZCN2J3/exec';
-
         let allRegistrations = [];
+        let sentRegistrations = [];
+        let currentTab = 'pending';
+        let countdownSeconds = 300;
+        let previousTotal = 0;
+
+        // ==================== الوضع الداكن ====================
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+        if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+
+        // ==================== التبويبات ====================
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn:${tab === 'pending' ? 'first' : 'last'}-child`).classList.add('active');
+            if (tab === 'pending') renderTable(allRegistrations);
+            else renderSentTable(sentRegistrations);
+            document.getElementById('resultCount').textContent = tab === 'pending' ? allRegistrations.length : sentRegistrations.length;
+            document.getElementById('selectAll').checked = false;
+        }
 
         // ==================== تحميل البيانات ====================
         async function loadDashboard() {
             const refreshBtn = document.getElementById('refreshBtn');
             refreshBtn.disabled = true;
-            refreshBtn.textContent = '⏳ جاري التحميل...';
+            refreshBtn.textContent = '⏳ جاري...';
+            countdownSeconds = 300;
 
             try {
-                // تحميل الإحصائيات
-                console.log('📊 جاري تحميل الإحصائيات...');
-                const statsRes = await fetch(API_URL + '?action=stats');
-                const statsText = await statsRes.text();
-                console.log('📊 رد الإحصائيات (نص):', statsText);
-                
-                let stats;
-                try {
-                    stats = JSON.parse(statsText);
-                } catch (e) {
-                    console.error('❌ فشل تحليل JSON للإحصائيات:', e);
-                    throw new Error('الرد ليس JSON صحيح');
-                }
-                
+                const [statsRes, regRes, sentRes] = await Promise.all([
+                    fetch(API_URL + '?action=stats'),
+                    fetch(API_URL + '?action=getAll'),
+                    fetch(API_URL + '?action=getSent')
+                ]);
+
+                const stats = await statsRes.json();
+                const regData = await regRes.json();
+                const sentData = await sentRes.json();
+
                 if (stats.success) {
                     document.getElementById('statPending').textContent = stats.pendingTotal || 0;
                     document.getElementById('statSent').textContent = stats.sentTotal || 0;
                     document.getElementById('statCountries').textContent = stats.uniqueCountries || 0;
+                    document.getElementById('pendingCount').textContent = stats.pendingTotal || 0;
+                    document.getElementById('sentCount').textContent = stats.sentTotal || 0;
                     if (stats.lastRegistration && stats.lastRegistration[1]) {
-                        document.getElementById('statLast').textContent = 
-                            stats.lastRegistration[1] + ' - ' + (stats.lastRegistration[0] || '');
-                    } else {
-                        document.getElementById('statLast').textContent = 'لا يوجد';
+                        document.getElementById('statLast').textContent = stats.lastRegistration[1] + ' - ' + (stats.lastRegistration[0] || '');
                     }
                 }
 
-                // تحميل المسجلين
-                console.log('📋 جاري تحميل المسجلين...');
-                const regRes = await fetch(API_URL + '?action=getAll');
-                const regText = await regRes.text();
-                console.log('📋 رد المسجلين (نص):', regText);
-                
-                let regData;
-                try {
-                    regData = JSON.parse(regText);
-                } catch (e) {
-                    console.error('❌ فشل تحليل JSON للمسجلين:', e);
-                    throw new Error('الرد ليس JSON صحيح');
-                }
-                
-                console.log('📋 بيانات المسجلين:', regData);
-                
                 if (regData.success) {
                     allRegistrations = regData.registrations || [];
-                    console.log('✅ عدد المسجلين:', allRegistrations.length);
-                    renderTable(allRegistrations);
-                } else {
-                    console.error('❌ فشل من الخادم:', regData.error);
-                    showToast('❌ ' + (regData.error || 'فشل تحميل البيانات'), 'error');
-                    document.getElementById('tableBody').innerHTML = 
-                        '<tr class="error-row"><td colspan="8">❌ فشل تحميل البيانات: ' + 
-                        (regData.error || 'خطأ غير معروف') + '</td></tr>';
+                    if (allRegistrations.length > previousTotal) {
+                        playNotificationSound();
+                    }
+                    previousTotal = allRegistrations.length;
+                    if (currentTab === 'pending') renderTable(allRegistrations);
                 }
+
+                if (sentData.success) {
+                    sentRegistrations = sentData.registrations || [];
+                    if (currentTab === 'sent') renderSentTable(sentRegistrations);
+                }
+
             } catch (err) {
-                console.error('❌ خطأ في الاتصال:', err);
-                showToast('❌ فشل الاتصال بالخادم. تأكد من الرابط والإنترنت.', 'error');
-                document.getElementById('tableBody').innerHTML = 
-                    '<tr class="error-row"><td colspan="8">❌ فشل الاتصال. افتح Console للمزيد من التفاصيل (F12).</td></tr>';
+                console.error('خطأ:', err);
             } finally {
                 refreshBtn.disabled = false;
-                refreshBtn.textContent = '🔄 تحديث البيانات';
+                refreshBtn.textContent = '🔄 تحديث';
             }
         }
 
-        // ==================== عرض الجدول ====================
+        // ==================== عرض الجداول ====================
         function renderTable(registrations) {
             const tbody = document.getElementById('tableBody');
             document.getElementById('resultCount').textContent = registrations.length;
-            
-            console.log('🖼️ عرض ' + registrations.length + ' مسجل في الجدول');
-
             if (registrations.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
-                    <div class="icon">📭</div>
-                    <h3>لا يوجد مسجلين حالياً</h3>
-                    <p>عند تسجيل متدربين جدد، سيظهرون هنا</p>
-                </div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📭</div><h3>لا يوجد مسجلين</h3></div></td></tr>`;
                 return;
             }
-
-            tbody.innerHTML = registrations.map((reg, index) => `
+            tbody.innerHTML = registrations.map((reg, i) => `
                 <tr id="row-${reg.row}">
-                    <td>${index + 1}</td>
+                    <td><input type="checkbox" class="row-check" data-row="${reg.row}" ${reg.selected ? 'checked' : ''}></td>
+                    <td>${i + 1}</td>
+                    <td>${reg.timestamp || '--'}</td>
+                    <td class="name-cell" title="انقر لنسخ الاسم" onclick="copyText('${escapeHtml(reg.name)}')">${escapeHtml(reg.name)}</td>
+                    <td>${escapeHtml(reg.email)}</td>
+                    <td class="phone-cell" onclick="copyText('${escapeHtml(reg.phone)}')" dir="ltr">
+                        ${escapeHtml(reg.phone)}
+                        <span class="copy-tooltip">📋 نسخ</span>
+                    </td>
+                    <td><span class="country-badge">${getCountryFlag(reg.country)} ${reg.country || '--'}</span></td>
+                    <td><a href="${reg.whatsappLink}" target="_blank" class="btn-wa">💬 واتساب</a></td>
+                    <td><button class="btn-sent" onclick="markAsSent(${reg.row}, this)">✅ إرسال</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSentTable(registrations) {
+            const tbody = document.getElementById('tableBody');
+            document.getElementById('resultCount').textContent = registrations.length;
+            if (registrations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">✅</div><h3>لا يوجد مرسل لهم بعد</h3></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = registrations.map((reg, i) => `
+                <tr>
+                    <td>--</td>
+                    <td>${i + 1}</td>
                     <td>${reg.timestamp || '--'}</td>
                     <td class="name-cell">${escapeHtml(reg.name)}</td>
                     <td>${escapeHtml(reg.email)}</td>
                     <td dir="ltr">${escapeHtml(reg.phone)}</td>
                     <td><span class="country-badge">${getCountryFlag(reg.country)} ${reg.country || '--'}</span></td>
-                    <td>
-                        <a href="${reg.whatsappLink}" target="_blank" class="btn-wa" title="فتح المحادثة في واتساب">
-                            💬 واتساب
-                        </a>
-                    </td>
-                    <td>
-                        <button class="btn-sent" onclick="markAsSent(${reg.row}, this)" title="نقل إلى قائمة تم الإرسال">
-                            ✅ تم الإرسال
-                        </button>
-                    </td>
+                    <td><a href="${reg.whatsappLink}" target="_blank" class="btn-wa">💬 واتساب</a></td>
+                    <td><span style="color:var(--green);font-weight:700;">✅ تم</span></td>
                 </tr>
             `).join('');
         }
 
-        // ==================== بحث وتصفية ====================
-        function filterTable() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!query) {
-                renderTable(allRegistrations);
-                return;
-            }
-            const filtered = allRegistrations.filter(reg => 
-                (reg.name && reg.name.toLowerCase().includes(query)) ||
-                (reg.email && reg.email.toLowerCase().includes(query)) ||
-                (reg.phone && reg.phone.includes(query)) ||
-                (reg.country && reg.country.toLowerCase().includes(query))
-            );
-            renderTable(filtered);
+        // ==================== تحديد الكل ====================
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.row-check').forEach(cb => cb.checked = checked);
         }
 
-        // ==================== نقل إلى تم الإرسال ====================
-        async function markAsSent(rowNumber, btnElement) {
-            if (!confirm('هل أنت متأكد من نقل هذا المتدرب إلى قائمة "تم الإرسال"؟')) return;
+        function getSelectedRows() {
+            return Array.from(document.querySelectorAll('.row-check:checked')).map(cb => parseInt(cb.dataset.row));
+        }
 
-            btnElement.disabled = true;
-            btnElement.textContent = '⏳ جاري...';
+        // ==================== تصدير Excel ====================
+        function exportToExcel() {
+            const data = currentTab === 'pending' ? allRegistrations : sentRegistrations;
+            if (data.length === 0) return showToast('⚠️ لا توجد بيانات للتصدير', 'error');
+            let csv = 'الاسم,البريد,الهاتف,الدولة,التاريخ\n';
+            data.forEach(r => csv += `"${r.name}","${r.email}","${r.phone}","${r.country}","${r.timestamp}"\n`);
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'مشروع_العمر_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click(); URL.revokeObjectURL(url);
+            showToast('✅ تم التصدير بنجاح', 'success');
+        }
 
-            try {
-                const response = await fetch(API_URL + '?action=moveToSent&row=' + rowNumber);
-                const text = await response.text();
-                console.log('📤 رد النقل:', text);
-                const result = JSON.parse(text);
-
-                if (result.success) {
-                    const row = document.getElementById('row-' + rowNumber);
-                    if (row) {
-                        row.classList.add('removing');
-                        setTimeout(() => {
-                            row.remove();
-                            updateRowNumbers();
-                            document.getElementById('resultCount').textContent = 
-                                document.querySelectorAll('#tableBody tr:not(.loading-row):not(.error-row):not(.empty-state)').length;
-                        }, 350);
-                    }
-                    
-                    document.getElementById('statPending').textContent = result.remainingTotal || 0;
-                    document.getElementById('statSent').textContent = result.sentTotal || 0;
-                    
-                    showToast('✅ ' + result.message, 'success');
-                } else {
-                    showToast('❌ ' + (result.error || 'حدث خطأ'), 'error');
-                    btnElement.disabled = false;
-                    btnElement.textContent = '✅ تم الإرسال';
-                }
-            } catch (err) {
-                console.error('❌ خطأ في النقل:', err);
-                showToast('❌ فشل الاتصال بالخادم', 'error');
-                btnElement.disabled = false;
-                btnElement.textContent = '✅ تم الإرسال';
+        // ==================== نقل جماعي ====================
+        async function bulkMoveAll() {
+            const selected = getSelectedRows();
+            if (selected.length === 0) return showToast('⚠️ حدد صفوفاً أولاً أو استخدم "نقل الكل" بحذر', 'error');
+            if (!confirm(`نقل ${selected.length} متدرب إلى "تم الإرسال"؟`)) return;
+            for (const row of selected) {
+                try { await fetch(API_URL + '?action=moveToSent&row=' + row); } catch(e) {}
             }
+            showToast(`✅ تم نقل ${selected.length} متدرب`, 'success');
+            loadDashboard();
+        }
+
+        // ==================== نسخ النص ====================
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => showToast('📋 تم النسخ: ' + text, 'success'));
+        }
+
+        // ==================== إشعار صوتي ====================
+        function playNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                osc.type = 'sine'; osc.frequency.value = 800;
+                osc.connect(ctx.destination); osc.start();
+                setTimeout(() => osc.stop(), 200);
+            } catch(e) {}
         }
 
         // ==================== دوال مساعدة ====================
-        function updateRowNumbers() {
-            const rows = document.querySelectorAll('#tableBody tr:not(.loading-row):not(.error-row)');
-            rows.forEach((row, index) => {
-                const firstCell = row.querySelector('td:first-child');
-                if (firstCell) firstCell.textContent = index + 1;
-            });
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const data = currentTab === 'pending' ? allRegistrations : sentRegistrations;
+            renderTable(query ? data.filter(r => (r.name&&r.name.toLowerCase().includes(query))||(r.email&&r.email.toLowerCase().includes(query))||(r.phone&&r.phone.includes(query))||(r.country&&r.country.toLowerCase().includes(query))) : data);
         }
 
-        function getCountryFlag(code) {
-            const flags = {
-                'SA': '🇸🇦', 'EG': '🇪🇬', 'AE': '🇦🇪', 'KW': '🇰🇼', 'QA': '🇶🇦',
-                'OM': '🇴🇲', 'BH': '🇧🇭', 'JO': '🇯🇴', 'PS': '🇵🇸', 'IQ': '🇮🇶',
-                'YE': '🇾🇪', 'SY': '🇸🇾', 'LB': '🇱🇧', 'LY': '🇱🇾', 'TN': '🇹🇳',
-                'DZ': '🇩🇿', 'MA': '🇲🇦', 'SD': '🇸🇩', 'TR': '🇹🇷', 'ID': '🇮🇩',
-                'MY': '🇲🇾', 'PK': '🇵🇰', 'IN': '🇮🇳', 'BD': '🇧🇩', 'GB': '🇬🇧',
-                'US': '🇺🇸', 'CA': '🇨🇦', 'AU': '🇦🇺', 'DE': '🇩🇪', 'FR': '🇫🇷'
-            };
-            return flags[code] || '🌍';
+        async function markAsSent(rowNumber, btnElement) {
+            if (!confirm('نقل هذا المتدرب إلى "تم الإرسال"؟')) return;
+            btnElement.disabled = true; btnElement.textContent = '⏳';
+            try {
+                const res = await fetch(API_URL + '?action=moveToSent&row=' + rowNumber);
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById('row-'+rowNumber)?.classList.add('removing');
+                    setTimeout(() => { loadDashboard(); }, 400);
+                    showToast('✅ ' + result.message, 'success');
+                } else {
+                    showToast('❌ ' + (result.error||'خطأ'), 'error');
+                    btnElement.disabled = false; btnElement.textContent = '✅ إرسال';
+                }
+            } catch(e) {
+                showToast('❌ فشل الاتصال', 'error');
+                btnElement.disabled = false; btnElement.textContent = '✅ إرسال';
+            }
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        function getCountryFlag(c) {
+            const f={'SA':'🇸🇦','EG':'🇪🇬','AE':'🇦🇪','KW':'🇰🇼','QA':'🇶🇦','OM':'🇴🇲','JO':'🇯🇴','PS':'🇵🇸','IQ':'🇮🇶','YE':'🇾🇪','SY':'🇸🇾','LB':'🇱🇧','LY':'🇱🇾','TN':'🇹🇳','DZ':'🇩🇿','MA':'🇲🇦','SD':'🇸🇩','TR':'🇹🇷','ID':'🇮🇩','MY':'🇲🇾','PK':'🇵🇰','IN':'🇮🇳','GB':'🇬🇧','US':'🇺🇸','CA':'🇨🇦','AU':'🇦🇺','DE':'🇩🇪','FR':'🇫🇷'};
+            return f[c]||'🌍';
+        }
+        function escapeHtml(t) { if(!t)return''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        function showToast(m, type='success') {
+            const existing=document.querySelector('.toast'); if(existing)existing.remove();
+            const t=document.createElement('div'); t.className='toast '+type; t.textContent=m;
+            document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
         }
 
-        function showToast(message, type = 'success') {
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) existingToast.remove();
-            
-            const toast = document.createElement('div');
-            toast.className = 'toast ' + type;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.remove(), 3000);
-        }
+        // ==================== عداد تنازلي ====================
+        setInterval(() => {
+            countdownSeconds--;
+            if (countdownSeconds <= 0) { loadDashboard(); countdownSeconds = 300; }
+            const m = Math.floor(countdownSeconds/60);
+            const s = countdownSeconds%60;
+            document.getElementById('countdown').textContent = m+':'+(s<10?'0':'')+s;
+        }, 1000);
 
-        // ==================== تشغيل ====================
+        // ==================== بدء ====================
         loadDashboard();
-        setInterval(loadDashboard, 300000); // تحديث كل 5 دقائق
 
-        console.log('%c📋 لوحة تحكم مشروع العمر %c| %cجاهزة',
-            'color: #c99a2b; font-size: 1.2rem;', '', 'color: #0d5559;');
-        console.log('%c🔗 API URL:%c ' + API_URL, 'color: #666;', 'color: #999;');
-        console.log('%c💡 افتح F12 لرؤية سجلات التصحيح', 'color: #888;');
+        console.log('%c🌟 مشروع العمر %c| %cلوحة تحكم احترافية v2.0', 'color:#c99a2b;font-size:1.2rem;','','color:#0d5559;');
+        console.log('%c✨ إضافات: تصدير Excel | نسخ بنقرة | نقل جماعي | وضع داكن | إشعار صوتي', 'color:#888;');
     </script>
 </body>
 </html>
